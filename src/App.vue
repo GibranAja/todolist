@@ -1,55 +1,3 @@
-<script setup>
-import { ref, onMounted, computed, watch } from 'vue'
-
-const todos = ref([])
-const name = ref('')
-
-const input_content = ref('')
-const input_category = ref(null)
-
-const todos_asc = computed(() =>
-  todos.value.sort((a, b) => {
-    return b.createdAt - a.createdAt
-  })
-)
-
-const addTodo = () => {
-  if (input_content.value.trim() === '' || input_category.value === null) {
-    return
-  }
-  todos.value.push({
-    content: input_content.value,
-    category: input_category.value,
-    done: false,
-    createdAt: new Date().getTime()
-  })
-
-  input_category.value = ''
-  input_content.value = null
-}
-
-const removeTodo = todo => {
-  todos.value = todos.value.filter(t => t!== todo)
-}
-
-watch(
-  todos,
-  (newVal) => {
-    localStorage.setItem('todos', JSON.stringify(newVal))
-  },
-  { deep: true }
-)
-
-watch(name, (newVal) => {
-  localStorage.setItem('name', newVal)
-})
-
-onMounted(() => {
-  name.value = localStorage.getItem('name') || ''
-  todos.value = JSON.parse(localStorage.getItem('todos')) || []
-})
-</script>
-
 <template>
   <main class="app">
     <section class="greeting">
@@ -79,10 +27,10 @@ onMounted(() => {
 
     <section class="todo-list">
       <h3>TODO LIST</h3>
-      <div class="list">
-        <div v-for="todo in todos_asc" :class="`todo-item ${todo.done && 'done'}`">
+      <div v-if="todosAsc.length > 0" class="list">
+        <div v-for="todo in todosAsc" :class="`todo-item ${todo.done && 'done'}`">
           <label>
-            <input type="checkbox" v-model="todo.done">
+            <input type="checkbox" v-model="todo.done" />
             <span :class="`bubble ${todo.category}`"></span>
           </label>
           <div class="todo-content">
@@ -93,6 +41,68 @@ onMounted(() => {
           </div>
         </div>
       </div>
+      <p v-else class="empty-todo-message">Kamu belum membuat todo apapun nih -_-</p>
     </section>
   </main>
 </template>
+
+<script setup>
+import { ref, onMounted, computed, watch } from 'vue'
+
+const todos = ref([])
+const name = ref('')
+
+const input_content = ref('')
+const input_category = ref(null)
+
+const todosAsc = computed(() =>
+  todos.value.sort((a, b) => {
+    return b.createdAt - a.createdAt
+  })
+)
+
+const addTodo = () => {
+  if (input_content.value.trim() === '' || input_category.value === null) {
+    return
+  }
+  todos.value.push({
+    content: input_content.value,
+    category: input_category.value,
+    done: false,
+    createdAt: new Date().getTime()
+  })
+
+  input_category.value = ''
+  input_content.value = null
+}
+
+const removeTodo = (todo) => {
+  todos.value = todos.value.filter((t) => t !== todo)
+}
+
+watch(
+  todos,
+  (newVal) => {
+    localStorage.setItem('todos', JSON.stringify(newVal))
+  },
+  { deep: true }
+)
+
+watch(name, (newVal) => {
+  localStorage.setItem('name', newVal)
+})
+
+onMounted(() => {
+  name.value = localStorage.getItem('name') || ''
+  todos.value = JSON.parse(localStorage.getItem('todos')) || []
+})
+</script>
+
+<style scoped>
+.empty-todo-message {
+  margin-top: 1.5rem;
+  text-align: center;
+  color: var(--grey);
+  font-style: italic;
+}
+</style>
