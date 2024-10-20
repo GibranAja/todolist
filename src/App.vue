@@ -47,7 +47,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 
 const todos = ref([])
 const name = ref('')
@@ -55,11 +55,10 @@ const name = ref('')
 const input_content = ref('')
 const input_category = ref(null)
 
-const todosAsc = computed(() =>
+const todosAsc = () =>
   todos.value.sort((a, b) => {
     return b.createdAt - a.createdAt
   })
-)
 
 const addTodo = () => {
   if (input_content.value.trim() === '' || input_category.value === null) {
