@@ -28,7 +28,7 @@
     <section class="todo-list">
       <h3>TODO LIST</h3>
       <div v-if="todosAsc.length > 0" class="list">
-        <div v-for="todo in todosAsc" :class="`todo-item ${todo.done && 'done'}`">
+        <div v-for="todo in todosAsc" :key="todo.createdAt" :class="`todo-item ${todo.done && 'done'}`">
           <label>
             <input type="checkbox" v-model="todo.done" />
             <span :class="`bubble ${todo.category}`"></span>
@@ -47,7 +47,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 
 const todos = ref([])
 const name = ref('')
@@ -55,10 +55,12 @@ const name = ref('')
 const input_content = ref('')
 const input_category = ref(null)
 
-const todosAsc = () =>
-  todos.value.sort((a, b) => {
+// Change to computed property
+const todosAsc = computed(() =>
+  [...todos.value].sort((a, b) => {
     return b.createdAt - a.createdAt
   })
+)
 
 const addTodo = () => {
   if (input_content.value.trim() === '' || input_category.value === null) {
